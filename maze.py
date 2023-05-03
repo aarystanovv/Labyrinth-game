@@ -3,91 +3,91 @@ import sys
 import random
 import pygame
 from pygame import gfxdraw
-from create_maze import printMaze
+from create_labyrynth import printLabyrynth
 
 class Player(object):
 
     def __init__(self):
         self.rect = pygame.Rect(20, 20, 16, 16)
 
-    def move(self, dx, dy):
+    def moving(self, dx, dy):
         if dx != 0:
-            self.move_single_axis(dx, 0)
+            self.moving_single_axis(dx, 0)
         if dy != 0:
-            self.move_single_axis(0, dy)
+            self.moving_single_axis(0, dy)
 
-    def move_single_axis(self, dx, dy):
+    def moving_single_axis(self, dx, dy):
         self.rect.x += dx
         self.rect.y += dy
-        self.collision(dx, dy)
+        self.shock(dx, dy)
 
-    def collision(self, dx, dy):
-        for wall in walls:
-            if self.rect.colliderect(wall.rect):
+    def shock(self, dx, dy):
+        for Divider in Dividers:
+            if self.rect.colliderect(Divider.rect):
                 if dx > 0:
-                    self.rect.right = wall.rect.left
+                    self.rect.right = Divider.rect.left
                 if dx < 0:
-                    self.rect.left = wall.rect.right
+                    self.rect.left = Divider.rect.right
                 if dy > 0:
-                    self.rect.bottom = wall.rect.top
+                    self.rect.bottom = Divider.rect.top
                 if dy < 0:
-                    self.rect.top = wall.rect.bottom
+                    self.rect.top = Divider.rect.bottom
 
 
-class Wall(object):
+class Divider(object):
 
     def __init__(self, pos):
-        walls.append(self)
+        Dividers.append(self)
         self.rect = pygame.Rect(pos[0], pos[1], 16, 16)
 
 
 os.environ["SDL_VIDEO_CENTERED"] = "1"
-level = printMaze()
+level = printLabyrynth()
 pygame.init()
 
 pygame.display.set_caption("Get to the red square!")
 screen = pygame.display.set_mode((560, 570))
 
-clock = pygame.time.Clock()
-walls = []
+time = pygame.time.Clock()
+Dividers = []
 player = Player()
 
 # Holds the level layout in a list of strings.
 
 
-# Parse the level string above. W = wall, E = exit
+# Parse the level string above. W = Divider, E = exit
 x = y = 1
 for row in level:
     for col in row:
         if col == "w":
-            Wall((x, y))
+            Divider((x, y))
         if col == "E":
             end_rect = pygame.Rect(x, y, 16, 16)
         x += 18
     y += 18
     x = 1
 
-running = True
-while running:
+fleeing = True
+while fleeing:
 
-    clock.tick(60)
+    time.tick(60)
 
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
-            running = False
+            fleeing = False
         if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
-            running = False
+            fleeing = False
 
-    # Move the player if an arrow key is pressed
+    # moving the player if an arrow key is pressed
     key = pygame.key.get_pressed()
     if key[pygame.K_LEFT]:
-        player.move(-2, 0)
+        player.moving(-2, 0)
     if key[pygame.K_RIGHT]:
-        player.move(2, 0)
+        player.moving(2, 0)
     if key[pygame.K_UP]:
-        player.move(0, -2)
+        player.moving(0, -2)
     if key[pygame.K_DOWN]:
-        player.move(0, 2)
+        player.moving(0, 2)
 
     # Just added this to make it slightly fun ;)
     if player.rect.colliderect(end_rect):
@@ -96,12 +96,12 @@ while running:
 
     # Draw the scene
     screen.fill((0, 0, 0))
-    for wall in walls:
-        pygame.draw.ellipse(screen, (230, 8, 8), wall.rect)
+    for Divider in Dividers:
+        pygame.draw.ellipse(screen, (230, 8, 8), Divider.rect)
         pygame.draw.rect(screen, (0, 153, 0), end_rect)
         pygame.draw.rect(screen, (239, 255, 0), player.rect)
     # gfxdraw.filled_circle(screen, 255, 200, 5, (0,128,128))
     pygame.display.flip()
-    clock.tick(360)
+    time.tick(360)
 
 pygame.quit()
